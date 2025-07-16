@@ -30,12 +30,21 @@ New-NetFirewallRule -Name "Allow-Ping" `
 # 5. Habilitar PowerShell Remoting
 Enable-PSRemoting -Force
 
+# 5.1. Verifica que WinRM está en ejecución
+Get-Service WinRM
 
+# 5.2. Verifica que existe el "listener" HTTP
+winrm enumerate winrm/config/listener
 
+# 6. Agrega el usuario de dominio al grupo local "Administradores"
 
+Add-LocalGroupMember -Group "Administradores" -Member "greenapple\griveros"
 
+# 6.1 Se verifica.
+Get-LocalGroupMember -Group "Administradores"
 
-
+# 7. Se verifica desde servidor principal DC01 
+Enter-PSSession -ComputerName SERV02 -Credential (Get-Credential)
 
 
 
