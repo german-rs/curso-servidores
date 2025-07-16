@@ -27,6 +27,10 @@ New-NetFirewallRule -Name "Allow-Ping" `
   -Enabled True `
   -Profile Any
 
+# 5. Habilitar PowerShell Remoting
+Enable-PSRemoting -Force
+
+
 
 
 
