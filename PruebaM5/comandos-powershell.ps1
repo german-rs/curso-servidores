@@ -109,6 +109,44 @@ Set-DhcpServerv4OptionValue -ScopeId 192.168.2.0 -DnsServer 192.168.2.2 -DnsDoma
 
 # 9. Asegurar la superficie de ataque.
 
+New-NetFirewallRule -DisplayName "Permitir DHCP entrante" `
+  -Direction Inbound `
+  -Protocol UDP `
+  -LocalPort 67 `
+  -Action Allow
+
+# 9.2 Para permitir respuestas DHCP (salida)
+New-NetFirewallRule -DisplayName "Permitir DHCP saliente" `
+  -Direction Outbound `
+  -Protocol UDP `
+  -LocalPort 68 `
+  -Action Allow
+
+
+# 9.3. Para consultas DNS
+New-NetFirewallRule -DisplayName "Permitir DNS entrante" `
+  -Direction Inbound `
+  -Protocol TCP `
+  -LocalPort 53 `
+  -Action Allow
+
+# 9.3. Para consultas DNS UDP
+New-NetFirewallRule -DisplayName "Permitir DNS entrante UDP" `
+  -Direction Inbound `
+  -Protocol UDP `
+  -LocalPort 53 `
+  -Action Allow
+
+
+#==============================
+# CONFIGURAR SERVICIOS CRÍTICOS
+#             DNS
+#==============================
+
+
+
+
+
 
 
 
