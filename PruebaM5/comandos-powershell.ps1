@@ -46,6 +46,25 @@ Get-LocalGroupMember -Group "Administradores"
 # 7. Se verifica desde servidor principal DC01 
 Enter-PSSession -ComputerName SERV02 -Credential (Get-Credential)
 
+#============================================
+# RESTRINGIR EL ACCESO A USUARIOS ESPECÍFICOS 
+# MEDIANTE POLÍTICAS DE SEGURIDAD
+#============================================
+
+# 1. Verificar si existe el grupo “Remote Management Users” en SERV02  
+Get-LocalGroup
+
+# 2. Ver qué usuarios tienen acceso a WinRM
+winrm get winrm/config/Service
+
+# 3. Crear una política para restringir acceso al usuario griveros.
+Set-PSSessionConfiguration -Name Microsoft.PowerShell -ShowSecurityDescriptorUI
+
+# 3.2 Reiniciar el servicio WinRM. 
+Restart-Service WinRM
+
+
+
 
 
 
