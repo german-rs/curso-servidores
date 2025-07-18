@@ -178,6 +178,47 @@ runas /user:greenapple\administrator powershell
 # 2. Eliminar la zona.
 Remove-DnsServerZone -Name "greenapple.local" -Force
 
+# 3. Creación de la zona como AD-integrada, desde DC01 (Controlador de dominio)
+Add-DnsServerPrimaryZone `
+  -Name "greenapple.local" `
+  -ReplicationScope "Domain" `
+  -DynamicUpdate Secure
+
+# 3.1 Verificación
+Get-DnsServerZone
+
+# 4. Pasar a SERV02 como controlador de dominio.
+
+# Verificación
+systeminfo | findstr /B /C:"Dominio"
+
+# 5. Cuenta con privilegios de administrador de dominio
+runas /user:greenapple\administrator powershell
+
+# 6. Instalar el rol de Servicios de dominio de Active Directory (AD DS).
+Install-WindowsFeature -Name AD-Domain-Services -IncludeManagementTools
+
+# 7. Verificación
+Get-WindowsFeature AD-Domain-Services
+
+# 8. Promover a SERV02 como Controlador de Dominio Adicional
+Install-ADDSDomainController `
+  -DomainName "greenapple.local" `
+  -Credential (Get-Credential) `
+  -InstallDns `
+  -SiteName "Default-First-Site-Name" `
+  -DatabasePath "C:\Windows\NTDS" `
+  -LogPath "C:\Windows\NTDS" `
+  -SYSVOLPath "C:\Windows\SYSVOL" `
+  -NoRebootOnCompletion:$false `
+  -Force
+
+
+
+
+
+
+
 
 
 
