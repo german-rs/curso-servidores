@@ -143,13 +143,40 @@ New-NetFirewallRule -DisplayName "Permitir DNS entrante UDP" `
 #             DNS
 #==============================
 
+# 1. Instalar el rol DNS.
+Install-WindowsFeature -Name DNS -IncludeManagementTools
 
+# 2. Verificar que el servicio DNS esté activo.
+Get-Service -Name DNS
 
+# 3. Verificar la existencia de zona
+Get-DnsServerZone
 
+# 3. Verificar los detalles de la zona greenapple.local.
+Get-DnsServerZone -Name "greenapple.local" | Format-List *
 
+# 4. Confirmar que está sirviendo consultas (resolver nombres).
+Add-DnsServerResourceRecordA -Name "prueba" -ZoneName "greenapple.local" -IPv4Address 192.168.2.50
 
+Get-DnsServerResourceRecord -ZoneName "greenapple.local" -Name "prueba"
 
+# 5. Se valida desde DC01.
+Resolve-DnsName prueba.greenapple.local -Server 192.168.2.4
 
+# 6.  Permitir la entrada al puerto UDP 53 y TCP 53.
+New-NetFirewallRule -DisplayName "Permitir DNS UDP" -Direction Inbound -Protocol UDP -LocalPort 53 -Action Allow
+New-NetFirewallRule -DisplayName "Permitir DNS TCP" -Direction Inbound -Protocol TCP -LocalPort 53 -Action Allow
+
+#============================
+# GESTIÓN SEGURA DE ZONAS DNS
+#   Y ASIGNACIÓN DE IPs
+#============================
+
+# 1. Cambiar a usuario administrador de dominio
+runas /user:greenapple\administrator powershell
+
+# 2. Eliminar la zona.
+Remove-DnsServerZone -Name "greenapple.local" -Force
 
 
 
