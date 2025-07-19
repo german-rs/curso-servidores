@@ -213,9 +213,34 @@ Install-ADDSDomainController `
   -NoRebootOnCompletion:$false `
   -Force
 
+# 9. Verificar que SERV02 ahora es un DC.
+Get-ADDomainController -Filter * | Format-Table Name, IPv4Address, IsGlobalCatalog
+
+# 10. Verifica la zona DNS integrada en el directorio.
+Get-DnsServerZone
 
 
+#===============================================
+# IMPLEMENTACIÓN DE POLÍTICA DE ASIGNACIÓN DE IP
+#     ESTÁTICA Y DINÁMICA UTILIZANDO DHCP
+#             DE MANERA SEGURA
+#===============================================
 
+# 1. Validar y ajustar el ámbito DHCP existente.
+Get-DhcpServerv4Scope -ScopeId 192.168.2.0 | Format-List ScopeId, StartRange, EndRange, SubnetMask, LeaseDuration
+
+# 2. Reservas estáticas.
+Add-DhcpServerv4Reservation `
+  -ScopeId 192.168.2.0 `
+  -IPAddress 192.168.2.20 `
+  -ClientId "00-11-22-33-44-55" `
+  -Description "Impresora Sala de Juntas"
+
+# 3. Configurar la detección de conflictos para evitar duplicación de Ips.
+Set-DhcpServerSetting -ConflictDetectionAttempts 2
+
+# 4 Habilitar auditoría de eventos DHCP:
+ Set-DhcpServerAuditLog -Enable $true -Path "C:\Windows\System32\dhcp\audit.log"
 
 
 
